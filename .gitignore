@@ -36,7 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 
-### 환경변수 (DB 비밀번호, JWT 시크릿키 등 절대 올리면 안됨) ###
+### 환경변수 ###
 application-local.yml
 .env
 
@@ -46,3 +46,17 @@ application-local.yml
 ### Log ###
 *.log
 logs/
+
+### Java ###
+*.class
+*.ctxt
+.mtj.tmp/
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
