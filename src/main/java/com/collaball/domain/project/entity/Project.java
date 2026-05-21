@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import com.collaball.domain.user.entity.User;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -33,6 +34,9 @@ public class Project {
     @Column(nullable = false)
     private ProjectStatus status;
 
+    @Column(nullable = false, unique = true, length = 36)
+    private String inviteCode;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
@@ -56,6 +60,7 @@ public class Project {
         this.description = description;
         this.owner = owner;
         this.status = status == null ? ProjectStatus.IN_PROGRESS : status;
+        this.inviteCode = UUID.randomUUID().toString();
     }
 
     public static Project create(String name, String description, User owner) {
@@ -65,6 +70,10 @@ public class Project {
                 .owner(owner)
                 .status(ProjectStatus.IN_PROGRESS)
                 .build();
+    }
+
+    public void regenerateInviteCode() {
+        this.inviteCode = UUID.randomUUID().toString();
     }
 
     public void update(String name, String description) {

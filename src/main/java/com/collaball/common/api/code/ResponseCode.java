@@ -30,6 +30,15 @@ public enum ResponseCode {
     PROJECT_UPDATED("PROJECT_200_02", "프로젝트가 수정되었습니다."),
     PROJECT_DELETED("PROJECT_200_03", "프로젝트가 삭제되었습니다."),
 
+    // 팀 멤버 & 초대
+    TEAM_MEMBER_ADDED("TEAM_201", "팀 멤버가 추가되었습니다."),
+    TEAM_MEMBER_FOUND("TEAM_200", "팀 멤버 조회에 성공했습니다."),
+    TEAM_MEMBER_ROLE_UPDATED("TEAM_200_02", "역할이 변경되었습니다."),
+    TEAM_MEMBER_REMOVED("TEAM_200_03", "팀 멤버가 제거되었습니다."),
+    INVITE_CODE_FOUND("TEAM_200_04", "초대 코드 조회에 성공했습니다."),
+    INVITE_CODE_REGENERATED("TEAM_200_05", "초대 코드가 재생성되었습니다."),
+    PROJECT_JOINED("TEAM_201_02", "프로젝트에 참여했습니다."),
+
     // 태스크
     TASK_CREATED("TASK_201", "태스크가 생성되었습니다."),
     TASK_FOUND("TASK_200", "태스크 조회에 성공했습니다."),

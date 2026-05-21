@@ -7,6 +7,8 @@ import com.collaball.domain.project.dto.ProjectResponse;
 import com.collaball.domain.project.dto.ProjectUpdateRequest;
 import com.collaball.domain.project.entity.Project;
 import com.collaball.domain.project.repository.ProjectRepository;
+import com.collaball.domain.task.repository.TaskAssignRepository;
+import com.collaball.domain.task.repository.TaskRepository;
 import com.collaball.domain.team.entity.TeamMember;
 import com.collaball.domain.team.repository.TeamMemberRepository;
 import com.collaball.domain.user.entity.User;
@@ -23,6 +25,8 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final TaskRepository taskRepository;
+    private final TaskAssignRepository taskAssignRepository;
 
     @Transactional
     public ProjectResponse createProject(ProjectCreateRequest request, User currentUser) {
@@ -53,8 +57,31 @@ public class ProjectService {
     @Transactional
     public void deleteProject(Long projectId, User currentUser) {
         Project project = getProjectWithEditPermission(projectId, currentUser);
+        List<Long> taskIds = taskRepository.findByProjectId(projectId).stream()
+                .map(task -> task.getId())
+                .toList();
+        if (!taskIds.isEmpty()) {
+            taskAssignRepository.deleteByTaskIdIn(taskIds);
+            taskRepository.deleteAllById(taskIds);
+        }
         teamMemberRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
+    }
+
+    public String getInviteCode(Long projectId, User currentUser) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PROJECT_NOT_FOUND));
+        if (!teamMemberRepository.existsByProjectIdAndUserIdAndRole(projectId, currentUser.getId(), com.collaball.domain.team.entity.TeamMemberRole.LEADER)) {
+            throw new BusinessException(ErrorCode.PROJECT_ACCESS_DENIED);
+        }
+        return project.getInviteCode();
+    }
+
+    @Transactional
+    public String regenerateInviteCode(Long projectId, User currentUser) {
+        Project project = getProjectWithEditPermission(projectId, currentUser);
+        project.regenerateInviteCode();
+        return project.getInviteCode();
     }
 
     private Project getProjectWithViewPermission(Long projectId, User currentUser) {

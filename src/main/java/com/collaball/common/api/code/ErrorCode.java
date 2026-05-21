@@ -34,8 +34,15 @@ public enum ErrorCode {
     PROJECT_ACCESS_DENIED("PROJECT_403", "프로젝트에 대한 접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
     ALREADY_PROJECT_MEMBER("PROJECT_409", "이미 프로젝트 멤버입니다.", HttpStatus.CONFLICT),
 
+    // 팀 멤버
+    TEAM_MEMBER_NOT_FOUND("TEAM_404", "팀 멤버를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    CANNOT_REMOVE_SELF("TEAM_400", "자기 자신은 팀에서 제거할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    CANNOT_CHANGE_OWN_ROLE("TEAM_400_02", "자신의 역할은 변경할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVITE_CODE_NOT_FOUND("TEAM_404_02", "유효하지 않은 초대 코드입니다.", HttpStatus.NOT_FOUND),
+
     // 태스크
     TASK_NOT_FOUND("TASK_404", "태스크를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    ASSIGNEE_NOT_PROJECT_MEMBER("TASK_400", "담당자는 프로젝트 멤버여야 합니다.", HttpStatus.BAD_REQUEST),
 
     // 평가
     EVALUATION_NOT_FOUND("EVAL_404", "평가를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),

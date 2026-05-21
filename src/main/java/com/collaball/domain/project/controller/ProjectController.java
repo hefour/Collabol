@@ -2,6 +2,7 @@ package com.collaball.domain.project.controller;
 
 import com.collaball.common.api.code.ResponseCode;
 import com.collaball.common.api.response.ApiResponse;
+import com.collaball.domain.project.dto.InviteCodeResponse;
 import com.collaball.domain.project.dto.ProjectCreateRequest;
 import com.collaball.domain.project.dto.ProjectResponse;
 import com.collaball.domain.project.dto.ProjectUpdateRequest;
@@ -72,5 +73,23 @@ public class ProjectController {
     ) {
         projectService.deleteProject(projectId, currentUser);
         return ApiResponse.ok(ResponseCode.PROJECT_DELETED);
+    }
+
+    @GetMapping("/{projectId}/invite-code")
+    public ResponseEntity<ApiResponse<InviteCodeResponse>> getInviteCode(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable Long projectId
+    ) {
+        String inviteCode = projectService.getInviteCode(projectId, currentUser);
+        return ApiResponse.ok(ResponseCode.INVITE_CODE_FOUND, new InviteCodeResponse(inviteCode));
+    }
+
+    @PostMapping("/{projectId}/invite-code/regenerate")
+    public ResponseEntity<ApiResponse<InviteCodeResponse>> regenerateInviteCode(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable Long projectId
+    ) {
+        String inviteCode = projectService.regenerateInviteCode(projectId, currentUser);
+        return ApiResponse.ok(ResponseCode.INVITE_CODE_REGENERATED, new InviteCodeResponse(inviteCode));
     }
 }

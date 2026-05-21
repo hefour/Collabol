@@ -58,4 +58,16 @@ public class TeamMember {
                 .role(TeamMemberRole.LEADER)
                 .build();
     }
+
+    public static TeamMember member(Project project, User user) {
+        return TeamMember.builder()
+                .project(project)
+                .user(user)
+                .role(TeamMemberRole.MEMBER)
+                .build();
+    }
+
+    public void updateRole(TeamMemberRole role) {
+        this.role = role;
+    }
 }
