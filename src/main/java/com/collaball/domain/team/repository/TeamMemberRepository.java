@@ -36,6 +36,10 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
 
     boolean existsByProjectIdAndUserIdAndRole(Long projectId, Long userId, TeamMemberRole role);
 
+    long countByProjectId(Long projectId);
+
+    long countByUserId(Long userId);
+
     void deleteByProjectId(Long projectId);
 
     void deleteByProjectIdAndUserId(Long projectId, Long userId);

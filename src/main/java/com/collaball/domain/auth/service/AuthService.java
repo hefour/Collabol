@@ -2,14 +2,19 @@ package com.collaball.domain.auth.service;
 
 import com.collaball.common.api.code.ErrorCode;
 import com.collaball.common.exception.BusinessException;
+import com.collaball.common.jwt.JwtProperties;
 import com.collaball.common.jwt.JwtProvider;
 import com.collaball.domain.auth.dto.LoginRequest;
+import com.collaball.domain.auth.dto.LogoutRequest;
+import com.collaball.domain.auth.dto.RefreshRequest;
 import com.collaball.domain.auth.dto.SendEmailRequest;
 import com.collaball.domain.auth.dto.SignupRequest;
 import com.collaball.domain.auth.dto.TokenResponse;
 import com.collaball.domain.auth.dto.VerifyCodeRequest;
 import com.collaball.domain.auth.entity.EmailVerification;
+import com.collaball.domain.auth.entity.RefreshToken;
 import com.collaball.domain.auth.repository.EmailVerificationRepository;
+import com.collaball.domain.auth.repository.RefreshTokenRepository;
 import com.collaball.domain.user.entity.User;
 import com.collaball.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +35,10 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final EmailVerificationRepository emailVerificationRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final JwtProperties jwtProperties;
     private final EmailService emailService;
 
     @Transactional
@@ -100,7 +107,7 @@ public class AuthService {
         emailVerificationRepository.delete(ev);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public TokenResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new BusinessException(ErrorCode.LOGIN_FAILED));
@@ -109,10 +116,58 @@ public class AuthService {
             throw new BusinessException(ErrorCode.LOGIN_FAILED);
         }
 
-        return new TokenResponse(
-                jwtProvider.generateAccessToken(user),
-                jwtProvider.generateRefreshToken(user.getEmail())
+        String accessToken = jwtProvider.generateAccessToken(user);
+        String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+        LocalDateTime expiresAt = LocalDateTime.now()
+                .plusSeconds(jwtProperties.getRefreshTokenExpiration() / 1000);
+
+        refreshTokenRepository.findByEmail(user.getEmail()).ifPresentOrElse(
+                rt -> rt.rotate(refreshToken, expiresAt),
+                () -> refreshTokenRepository.save(RefreshToken.builder()
+                        .email(user.getEmail())
+                        .token(refreshToken)
+                        .expiresAt(expiresAt)
+                        .build())
         );
+
+        return new TokenResponse(accessToken, refreshToken);
+    }
+
+    @Transactional
+    public TokenResponse refresh(RefreshRequest request) {
+        String token = request.refreshToken();
+
+        if (!jwtProvider.isValid(token)) {
+            throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        RefreshToken stored = refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+        if (LocalDateTime.now().isAfter(stored.getExpiresAt())) {
+            refreshTokenRepository.delete(stored);
+            throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        User user = userRepository.findByEmail(stored.getEmail())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        String newAccessToken = jwtProvider.generateAccessToken(user);
+        String newRefreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+        LocalDateTime newExpiresAt = LocalDateTime.now()
+                .plusSeconds(jwtProperties.getRefreshTokenExpiration() / 1000);
+
+        stored.rotate(newRefreshToken, newExpiresAt);
+
+        return new TokenResponse(newAccessToken, newRefreshToken);
+    }
+
+    @Transactional
+    public void logout(LogoutRequest request) {
+        RefreshToken stored = refreshTokenRepository.findByToken(request.refreshToken())
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+        refreshTokenRepository.delete(stored);
     }
 
     private String generateCode() {

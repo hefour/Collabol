@@ -51,6 +51,9 @@ public class User implements UserDetails {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @Column(length = 500)
+    private String bio;
+
     @Builder
     public User(String email, String password, String name, Department department) {
         this.email = email;
@@ -58,6 +61,10 @@ public class User implements UserDetails {
         this.name = name;
         this.department = department;
         this.role = Role.USER;
+    }
+
+    public void updateBio(String bio) {
+        this.bio = bio;
     }
 
     @Override

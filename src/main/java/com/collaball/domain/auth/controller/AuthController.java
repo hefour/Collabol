@@ -3,6 +3,8 @@ package com.collaball.domain.auth.controller;
 import com.collaball.common.api.code.ResponseCode;
 import com.collaball.common.api.response.ApiResponse;
 import com.collaball.domain.auth.dto.LoginRequest;
+import com.collaball.domain.auth.dto.LogoutRequest;
+import com.collaball.domain.auth.dto.RefreshRequest;
 import com.collaball.domain.auth.dto.SendEmailRequest;
 import com.collaball.domain.auth.dto.SignupRequest;
 import com.collaball.domain.auth.dto.TokenResponse;
@@ -45,5 +47,17 @@ public class AuthController {
     public ResponseEntity<ApiResponse<TokenResponse>> login(@Valid @RequestBody LoginRequest request) {
         TokenResponse tokens = authService.login(request);
         return ApiResponse.ok(ResponseCode.LOGIN_SUCCESS, tokens);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<TokenResponse>> refresh(@Valid @RequestBody RefreshRequest request) {
+        TokenResponse tokens = authService.refresh(request);
+        return ApiResponse.ok(ResponseCode.TOKEN_REISSUED, tokens);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(@Valid @RequestBody LogoutRequest request) {
+        authService.logout(request);
+        return ApiResponse.ok(ResponseCode.LOGOUT_SUCCESS);
     }
 }

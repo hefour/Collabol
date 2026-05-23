@@ -75,6 +75,15 @@ public class ProjectController {
         return ApiResponse.ok(ResponseCode.PROJECT_DELETED);
     }
 
+    @PutMapping("/{projectId}/complete")
+    public ResponseEntity<ApiResponse<ProjectResponse>> completeProject(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable Long projectId
+    ) {
+        ProjectResponse response = projectService.completeProject(projectId, currentUser);
+        return ApiResponse.ok(ResponseCode.PROJECT_COMPLETED, response);
+    }
+
     @GetMapping("/{projectId}/invite-code")
     public ResponseEntity<ApiResponse<InviteCodeResponse>> getInviteCode(
             @AuthenticationPrincipal User currentUser,

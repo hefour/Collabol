@@ -44,6 +44,9 @@ public enum ErrorCode {
     TASK_NOT_FOUND("TASK_404", "태스크를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ASSIGNEE_NOT_PROJECT_MEMBER("TASK_400", "담당자는 프로젝트 멤버여야 합니다.", HttpStatus.BAD_REQUEST),
 
+    // 리프레시 토큰
+    INVALID_REFRESH_TOKEN("AUTH_401_02", "유효하지 않은 리프레시 토큰입니다.", HttpStatus.UNAUTHORIZED),
+
     // 평가
     EVALUATION_NOT_FOUND("EVAL_404", "평가를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     DUPLICATE_EVALUATION("EVAL_409", "이미 해당 프로젝트에서 평가를 완료했습니다.", HttpStatus.CONFLICT),
