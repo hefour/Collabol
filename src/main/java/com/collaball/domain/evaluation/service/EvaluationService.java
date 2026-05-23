@@ -8,6 +8,7 @@ import com.collaball.domain.evaluation.dto.EvaluationUpdateRequest;
 import com.collaball.domain.evaluation.entity.Evaluation;
 import com.collaball.domain.evaluation.repository.EvaluationRepository;
 import com.collaball.domain.project.entity.Project;
+import com.collaball.domain.project.entity.ProjectStatus;
 import com.collaball.domain.project.repository.ProjectRepository;
 import com.collaball.domain.team.repository.TeamMemberRepository;
 import com.collaball.domain.user.entity.User;
@@ -57,7 +58,9 @@ public class EvaluationService {
                 request.comment()
         );
 
-        return EvaluationResponse.from(evaluationRepository.save(evaluation));
+        EvaluationResponse response = EvaluationResponse.from(evaluationRepository.save(evaluation));
+        tryCompleteEvaluation(project, projectId);
+        return response;
     }
 
     public List<EvaluationResponse> getMyEvaluations(Long projectId, User currentUser) {
@@ -103,6 +106,17 @@ public class EvaluationService {
         Evaluation evaluation = getEvaluationInProject(evaluationId, projectId);
         validateOwner(evaluation, currentUser.getId());
         evaluationRepository.delete(evaluation);
+    }
+
+    private void tryCompleteEvaluation(Project project, Long projectId) {
+        if (project.getStatus() != ProjectStatus.EVALUATION_PENDING) {
+            return;
+        }
+        long memberCount = teamMemberRepository.countByProjectId(projectId);
+        long required = memberCount * (memberCount - 1);
+        if (required > 0 && evaluationRepository.countByProjectId(projectId) >= required) {
+            project.completeEvaluation();
+        }
     }
 
     private Project getProject(Long projectId) {

@@ -29,6 +29,7 @@ public enum ResponseCode {
     PROJECT_FOUND("PROJECT_200", "프로젝트 조회에 성공했습니다."),
     PROJECT_UPDATED("PROJECT_200_02", "프로젝트가 수정되었습니다."),
     PROJECT_DELETED("PROJECT_200_03", "프로젝트가 삭제되었습니다."),
+    PROJECT_COMPLETED("PROJECT_200_04", "프로젝트가 완료되었습니다."),
 
     // 팀 멤버 & 초대
     TEAM_MEMBER_ADDED("TEAM_201", "팀 멤버가 추가되었습니다."),

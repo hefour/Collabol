@@ -81,6 +81,14 @@ public class Project {
         this.description = description;
     }
 
+    public void complete() {
+        this.status = ProjectStatus.EVALUATION_PENDING;
+    }
+
+    public void completeEvaluation() {
+        this.status = ProjectStatus.EVALUATION_COMPLETED;
+    }
+
     public boolean isOwnedBy(Long userId) {
         return owner != null && owner.getId().equals(userId);
     }

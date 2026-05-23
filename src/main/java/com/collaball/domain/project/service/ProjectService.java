@@ -7,6 +7,7 @@ import com.collaball.domain.project.dto.ProjectResponse;
 import com.collaball.domain.project.dto.ProjectUpdateRequest;
 import com.collaball.domain.project.entity.Project;
 import com.collaball.domain.project.repository.ProjectRepository;
+import com.collaball.domain.evaluation.repository.EvaluationRepository;
 import com.collaball.domain.task.repository.TaskAssignRepository;
 import com.collaball.domain.task.repository.TaskRepository;
 import com.collaball.domain.team.entity.TeamMember;
@@ -27,6 +28,7 @@ public class ProjectService {
     private final TeamMemberRepository teamMemberRepository;
     private final TaskRepository taskRepository;
     private final TaskAssignRepository taskAssignRepository;
+    private final EvaluationRepository evaluationRepository;
 
     @Transactional
     public ProjectResponse createProject(ProjectCreateRequest request, User currentUser) {
@@ -64,8 +66,16 @@ public class ProjectService {
             taskAssignRepository.deleteByTaskIdIn(taskIds);
             taskRepository.deleteAllById(taskIds);
         }
+        evaluationRepository.deleteByProjectId(projectId);
         teamMemberRepository.deleteByProjectId(projectId);
         projectRepository.delete(project);
+    }
+
+    @Transactional
+    public ProjectResponse completeProject(Long projectId, User currentUser) {
+        Project project = getProjectWithEditPermission(projectId, currentUser);
+        project.complete();
+        return ProjectResponse.from(project, currentUser.getId());
     }
 
     public String getInviteCode(Long projectId, User currentUser) {
