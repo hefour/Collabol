@@ -13,6 +13,8 @@ import com.collaball.domain.team.repository.TeamMemberRepository;
 import com.collaball.domain.user.entity.Department;
 import com.collaball.domain.user.entity.User;
 import com.collaball.domain.user.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -44,6 +46,9 @@ public class TestDataInitializer implements CommandLineRunner {
     private final TaskAssignRepository taskAssignRepository;
     private final EvaluationRepository evaluationRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     @Transactional
@@ -109,7 +114,8 @@ public class TestDataInitializer implements CommandLineRunner {
             });
         });
 
-        testUsers.forEach(user -> userRepository.delete(user));
+        testUsers.forEach(userRepository::delete);
+        entityManager.flush();
         log.info("[TEST] 이전 테스트 데이터 정리 완료");
     }
 
