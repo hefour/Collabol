@@ -36,6 +36,6 @@ public class DataInitializer implements CommandLineRunner {
                 .department(Department.소프트웨어학부)
                 .build());
 
-        log.info("[DataInitializer] 테스트 계정 생성 완료 - email: {}, password: {}", TEST_EMAIL, TEST_PASSWORD);
+        log.info("[DataInitializer] 테스트 계정 생성 완료 - email: {}", TEST_EMAIL);
     }
 }

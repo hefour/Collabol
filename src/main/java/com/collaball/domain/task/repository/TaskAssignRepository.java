@@ -14,6 +14,9 @@ public interface TaskAssignRepository extends JpaRepository<TaskAssign, Long> {
     @Query("select ta.user from TaskAssign ta where ta.task.id = :taskId")
     List<User> findUsersByTaskId(@Param("taskId") Long taskId);
 
+    @Query("select ta from TaskAssign ta join fetch ta.user where ta.task.project.id = :projectId")
+    List<TaskAssign> findAllWithUserByProjectId(@Param("projectId") Long projectId);
+
     @Modifying
     @Query("delete from TaskAssign ta where ta.task.id = :taskId")
     void deleteByTaskId(@Param("taskId") Long taskId);

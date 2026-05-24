@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +48,14 @@ public class TaskService {
 
     public List<TaskResponse> getTasks(Long projectId, User currentUser) {
         validateMemberPermission(projectId, currentUser);
+        Map<Long, List<User>> assigneesByTaskId = taskAssignRepository.findAllWithUserByProjectId(projectId)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        ta -> ta.getTask().getId(),
+                        Collectors.mapping(ta -> ta.getUser(), Collectors.toList())
+                ));
         return taskRepository.findByProjectIdOrderByCreatedAtDesc(projectId).stream()
-                .map(task -> TaskResponse.of(task, taskAssignRepository.findUsersByTaskId(task.getId())))
+                .map(task -> TaskResponse.of(task, assigneesByTaskId.getOrDefault(task.getId(), List.of())))
                 .toList();
     }
 
