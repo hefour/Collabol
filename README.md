@@ -1,18 +1,11 @@
-# Collabol, Collaboration for All
+# Collaball — Collaboration for All
 
-## 프로젝트 소개
+숭실대학교 학생 전용 팀 프로젝트 동료 평가 및 협업 프로필 플랫폼.
 
-Collabol은 대학생 팀 프로젝트 협업 신뢰를 위한 협업 프로필 플랫폼입니다.
+팀플 전에는 팀원의 협업 이력과 평가를 확인하고,  
+팀플 후에는 동료 평가를 통해 개인의 협업 프로필을 쌓아가는 서비스입니다.
 
-팀플 전에는 팀원의 협업 이력과 평가를 확인할 수 있고,  
-팀플 후에는 동료 평가를 통해 개인의 협업 프로필을 축적할 수 있습니다.
-
-Collabol은 Collaboration과 Ball의 합성어로,  
-문방구 간식 ‘콜라볼’에서 영감을 받아 만들어졌습니다.
-
-세 개의 볼은 팀 프로젝트 구성원과 협업을 상징하며,  
-슬로건 **Collaboration for All**은  
-모든 학생을 위한 협업 플랫폼이라는 의미를 담고 있습니다.
+> 주 타겟: 숭실대학교 2~4학년 대학생
 
 ---
 
@@ -21,71 +14,165 @@ Collabol은 Collaboration과 Ball의 합성어로,
 대학생 팀 프로젝트에서는 팀원의 역량과 협업 태도를 사전에 파악하기 어렵고,  
 무임승차나 역할 불균형 문제가 자주 발생합니다.
 
-Collabol은 협업 이력과 동료 평가 기반 프로필을 통해  
+Collaball은 협업 이력과 동료 평가 기반 프로필을 통해  
 신뢰 기반 팀 구성을 돕는 것을 목표로 합니다.
-
----
-
-## 주요 기능
-
-### 회원 관리
-- 학교 이메일 기반 회원가입 및 로그인
-- 기본 프로필 정보 관리
-
-### 프로젝트 & 태스크 관리
-- 프로젝트 생성
-- 팀원 초대
-- 태스크 생성 및 담당자 배정
-- 진행 상황 체크
-
-### 동료 평가
-- 스킬별 별점 평가
-- 자유 코멘트
-- 익명 평가 옵션
-- 중복 평가 방지
-
-### 프로필 카드
-- 스킬 점수 집계
-- 참여 프로젝트 수, 학기별 활동 타임라인 표시
-- 공유 가능한 프로필 링크 제공
 
 ---
 
 ## 기술 스택
 
 ### Frontend
--
+| 분류 | 기술 |
+|------|------|
+| Framework | React 19 + Vite |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Routing | React Router v7 |
+| HTTP | fetch (자체 래핑) |
+| Auth | JWT (Access Token + Refresh Token) |
 
 ### Backend
-- 
+| 분류 | 기술 |
+|------|------|
+| Language | Java 17 |
+| Framework | Spring Boot 3.5.13 |
+| Build | Gradle |
+| ORM | Spring Data JPA |
+| Auth | Spring Security + JWT (jjwt 0.12.3) |
+| Docs | Swagger (springdoc 2.3.0) |
+| Mail | Gmail SMTP |
 
 ### Database
 - MySQL
 
 ---
 
+## 주요 기능
+
+### 회원 관리
+- 숭실대 이메일(`@soongsil.ac.kr`) 인증 기반 회원가입
+- JWT 액세스/리프레시 토큰 로그인
+
+### 프로젝트 & 태스크 관리
+- 프로젝트 생성 및 초대 코드 기반 팀원 참가
+- 태스크 생성, 담당자 배정, 상태 관리 (TODO / IN_PROGRESS / DONE)
+
+### 동료 평가
+- 5개 항목 별점 평가 (발표력 / 커뮤니케이션 / 협업태도 / 성실성 / 기획력)
+- 자유 코멘트
+- 중복 평가 방지
+- 전원 평가 완료 시 프로젝트 상태 자동 전환
+
+### 프로필 카드
+- 받은 평가 점수 집계 및 평균 표시
+- 참여 프로젝트 수 표시
+- 공유 가능한 프로필 링크 제공
+
+---
+
+## API 명세
+
+> Base URL: `/api`  
+> 인증이 필요한 요청은 `Authorization: Bearer {accessToken}` 헤더 포함
+
+### 인증
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| POST | `/api/auth/email/send` | 이메일 인증 코드 발송 |
+| POST | `/api/auth/email/verify` | 이메일 인증 코드 확인 |
+| POST | `/api/auth/signup` | 회원가입 |
+| POST | `/api/auth/login` | 로그인 |
+| POST | `/api/auth/refresh` | 토큰 재발급 |
+| POST | `/api/auth/logout` | 로그아웃 |
+
+### 프로젝트
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/api/projects` | 내 프로젝트 목록 |
+| POST | `/api/projects` | 프로젝트 생성 |
+| GET | `/api/projects/:id` | 프로젝트 상세 |
+| PUT | `/api/projects/:id` | 프로젝트 수정 |
+| DELETE | `/api/projects/:id` | 프로젝트 삭제 |
+| PUT | `/api/projects/:id/complete` | 프로젝트 완료 처리 |
+| GET | `/api/projects/:id/invite-code` | 초대 코드 조회 |
+| POST | `/api/projects/:id/invite-code/regenerate` | 초대 코드 재발급 |
+
+### 팀원
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| POST | `/api/invitations/join/:inviteCode` | 초대 코드로 팀 참가 |
+| GET | `/api/projects/:id/members` | 팀원 목록 |
+| PATCH | `/api/projects/:id/members/:userId/role` | 역할 변경 (MEMBER / LEADER) |
+| DELETE | `/api/projects/:id/members/:userId` | 팀원 제거 |
+
+### 태스크
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/api/projects/:id/tasks` | 태스크 목록 |
+| POST | `/api/projects/:id/tasks` | 태스크 생성 |
+| GET | `/api/projects/:id/tasks/:taskId` | 태스크 상세 |
+| PUT | `/api/projects/:id/tasks/:taskId` | 태스크 수정 |
+| PATCH | `/api/projects/:id/tasks/:taskId/status` | 상태 변경 |
+| DELETE | `/api/projects/:id/tasks/:taskId` | 태스크 삭제 |
+
+### 동료 평가
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/api/projects/:id/evaluations` | 내가 한 평가 목록 |
+| GET | `/api/projects/:id/evaluations/received` | 내가 받은 평가 목록 |
+| POST | `/api/projects/:id/evaluations` | 평가 제출 |
+| PUT | `/api/projects/:id/evaluations/:evalId` | 평가 수정 |
+| DELETE | `/api/projects/:id/evaluations/:evalId` | 평가 삭제 |
+
+### 프로필
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/api/profile/:userId` | 프로필 조회 (인증 불필요) |
+
+---
+
+## 프로젝트 상태 흐름
+
+```
+IN_PROGRESS → EVALUATION_PENDING → EVALUATION_COMPLETED
+```
+
+- `IN_PROGRESS` → `EVALUATION_PENDING`: 리더가 프로젝트 완료 처리
+- `EVALUATION_PENDING` → `EVALUATION_COMPLETED`: 전원 상호 평가 완료 시 자동 전환
+
+---
+
+## 로컬 실행
+
+### Backend
+```bash
+./gradlew bootRun
+# 기본 포트: http://localhost:8080
+# 환경변수: DB_PASSWORD, MAIL_USERNAME, MAIL_PASSWORD, JWT_SECRET
+```
+
+### Frontend
+```bash
+npm install
+npm run dev
+# 기본 포트: http://localhost:5173
+# API 프록시: /api → http://localhost:8080
+```
+
+---
+
 ## 팀원 소개
 
-### 장준하 : 메인 개발 및 스피커  
-- 프로젝트 메인 로직 및 주요 기능 구현 주도  
-- 프로젝트 결과물 시연 및 최종 프레젠테이션 담당
-### 함성준 : 소프트웨어 개발
-- 안정적인 코드 베이스 구축 및 세부 기능 구현
-- 개발 파트 워크플로우 지원 및 코드 최적화
-### 엔흐솝드 : 디자인 및 시각 자료 제작
-- 프로젝트 UI/UX 디자인 및 시각 요소 총괄
-- 발표용 PPT 제작 및 최종 성과 보고서 편집
-### 안태경 : 데이터 수집 및 문서화
-- 설문조사 기획 및 사용자 요구사항 분석 데이터 도출
-- GitHub README 작성 및 프로젝트 가이드라인 구축
-
+| 이름 | 역할 |
+|------|------|
+| 장준하 | 메인 개발 및 발표 — 프로젝트 메인 로직 및 주요 기능 구현, 최종 프레젠테이션 담당 |
+| 함성준 | 소프트웨어 개발 — 코드 베이스 구축 및 세부 기능 구현, 코드 최적화 |
+| 엔흐솝드 | 디자인 — UI/UX 디자인 및 시각 요소 총괄, 발표 자료 제작 |
+| 안태경 | 데이터 및 문서화 — 사용자 요구사항 분석, README 및 프로젝트 가이드라인 작성 |
 
 ---
 
 ## 기대 효과
-### 다양성 교육 프로그램
-- 다국적 팀원 간 협업 경험을 통해 글로벌 협업 역량 함양
-### 확장 가능성
-- 학교 확장 및 타 대학 서비스 적용, 기업·부트캠프·해커톤 등으로 플랫폼 확장 가능
-### 공정한 평가 문화
-- 무임승차 방지, 기여도 투명화로 건강한 대학 협업 문화 정착
+
+- **공정한 평가 문화** — 무임승차 방지, 기여도 투명화로 건강한 대학 협업 문화 정착
+- **확장 가능성** — 숭실대 이후 타 대학, 기업·부트캠프·해커톤 등으로 플랫폼 확장 가능
