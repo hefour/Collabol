@@ -39,7 +39,6 @@ Collaball은 협업 이력과 동료 평가 기반 프로필을 통해
 | Build | Gradle |
 | ORM | Spring Data JPA |
 | Auth | Spring Security + JWT (jjwt 0.12.3) |
-| Docs | Swagger (springdoc 2.3.0) |
 | Mail | Gmail SMTP |
 
 ### Database
@@ -52,6 +51,11 @@ Collaball은 협업 이력과 동료 평가 기반 프로필을 통해
 ### 회원 관리
 - 숭실대 이메일(`@soongsil.ac.kr`) 인증 기반 회원가입
 - JWT 액세스/리프레시 토큰 로그인
+
+### 대시보드
+- 5개 협업 항목 평균 점수 종합 시각화
+- 진행 중인 프로젝트 요약 카드
+- 참여 프로젝트 수 / 작성한 평가 / 받은 평가 통계
 
 ### 프로젝트 & 태스크 관리
 - 프로젝트 생성 및 초대 코드 기반 팀원 참가
@@ -152,6 +156,7 @@ IN_PROGRESS → EVALUATION_PENDING → EVALUATION_COMPLETED
 ```
 
 ### Frontend
+> 프론트엔드는 별도 레포([collabol-FE](https://github.com/hefour/collabol-FE))에서 관리됩니다.
 ```bash
 npm install
 npm run dev
